@@ -75,7 +75,7 @@
   <repositories>
     <repository>
       <id>github</id>
-      <url>https://maven.pkg.github.com/cupo-transito/cupo-backend</url>
+      <url>https://maven.pkg.github.com/OscarHernandezVel/Parking-Watch-Back-1</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>

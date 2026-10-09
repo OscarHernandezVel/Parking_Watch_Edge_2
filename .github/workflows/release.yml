@@ -1,5 +1,6 @@
 # Entrega de cupo-edge: una etiqueta vX.Y.Z compila el JAR con los nativos de ARM64 y lo publica en
-# GitHub Releases junto con su huella SHA-256; la Raspberry Pi lo instala con deploy/update.sh.
+# GitHub Releases junto con su huella SHA-256. La instalación en Raspberry Pi es manual hasta que
+# el repositorio incorpore scripts de servicio.
 name: Release
 
 on:
@@ -21,11 +22,13 @@ jobs:
           java-version: "21"
           cache: maven
           server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GH_PACKAGES_TOKEN
       - name: Versión de la etiqueta
         run: ./mvnw -B -ntp versions:set -DnewVersion="${GITHUB_REF_NAME#v}" -DgenerateBackupPoms=false
       - name: JAR para la Raspberry Pi 5 (ARM64)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./mvnw -B -ntp -Praspberry package -Dquality.skip=true
       - name: Publicar en GitHub Releases
         env:
@@ -33,5 +36,4 @@ jobs:
         run: |
           cp target/cupo-edge-all.jar cupo-edge-all.jar
           sha256sum cupo-edge-all.jar > cupo-edge-all.jar.sha256
-          gh release create "$GITHUB_REF_NAME" cupo-edge-all.jar cupo-edge-all.jar.sha256 \
-            deploy/install.sh deploy/update.sh deploy/cupo-edge.service deploy/edge.env.example --generate-notes
+          gh release create "$GITHUB_REF_NAME" cupo-edge-all.jar cupo-edge-all.jar.sha256 --generate-notes

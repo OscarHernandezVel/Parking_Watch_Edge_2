@@ -6,7 +6,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [edgeMain]
 
 permissions:
   contents: read
@@ -29,9 +29,11 @@ jobs:
           java-version: "21"
           cache: maven
           server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GH_PACKAGES_TOKEN
       - name: Compilar, analizar y probar
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
         run: ./mvnw -B -ntp verify
       - name: Reportes
         if: always()
@@ -53,9 +55,11 @@ jobs:
           java-version: "21"
           cache: maven
           server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GH_PACKAGES_TOKEN
       - name: OWASP Dependency-Check (falla con CVSS >= 9)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PACKAGES_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: ./mvnw -B -ntp -Psecurity -DskipTests -Dquality.skip=true verify
 
