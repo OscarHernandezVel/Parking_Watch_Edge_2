@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Exclusiones justificadas de SpotBugs:
+  - EI_EXPOSE_REP/EI_EXPOSE_REP2: la inyección de dependencias por constructor (Spring y la raíz
+    de composición del agente) guarda referencias a colaboradores por diseño. Los objetos de
+    valor del dominio y del contrato sí hacen copias defensivas.
+  - CT_CONSTRUCTOR_THROW: los records y objetos de valor validan en el constructor a propósito.
+-->
+<FindBugsFilter>
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+  </Match>
+  <Match>
+    <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+  </Match>
+</FindBugsFilter>
