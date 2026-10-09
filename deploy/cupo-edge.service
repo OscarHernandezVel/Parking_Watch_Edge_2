@@ -1,0 +1,25 @@
+# Servicio systemd del Edge en la Raspberry Pi 5 (RNF-9.1): arranca solo al encender la Raspberry y
+# se reinicia ante fallas. Instalación: ver deploy/install.sh.
+[Unit]
+Description=Cupo - Edge de reconocimiento de parqueo (cámara e IA en tiempo real)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cupo
+Group=video
+WorkingDirectory=/opt/cupo-edge
+# Archivo protegido (permisos 600) con la URL del backend, el token y la cámara (RF-15.1).
+EnvironmentFile=/etc/cupo-edge/edge.env
+ExecStart=/usr/bin/java -XX:MaxRAMPercentage=60 -XX:+UseZGC -Djava.awt.headless=true -jar /opt/cupo-edge/cupo-edge-all.jar
+Restart=always
+RestartSec=5
+TimeoutStopSec=20
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/cupo-edge
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
