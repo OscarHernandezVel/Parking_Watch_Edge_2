@@ -1,0 +1,26 @@
+# Compilación Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Entorno local y secretos
+.env
+*.log
+
+
+
+# Datos locales del Edge y del entrenamiento (ml/)
+data/
+models/
+__pycache__/
+.venv/
+.pytest_cache/
+ml/runs/
+ml/datasets/

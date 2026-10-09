@@ -1,0 +1,8 @@
+# Finales de línea LF en el repositorio (los scripts .cmd de Windows mantienen CRLF).
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.jar binary
+*.onnx binary
+*.png binary
+*.jpg binary
