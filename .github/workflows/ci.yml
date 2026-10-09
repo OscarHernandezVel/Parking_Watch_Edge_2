@@ -1,0 +1,71 @@
+# Integración continua de cupo-edge (RNF-10.2): compilación, formato, estilo, análisis estático,
+# pruebas (incluida la maqueta simulada y videos grabados), cobertura >= 80 %, vulnerabilidades de
+# dependencias y pruebas del entrenamiento (ml/). Usa el contrato cupo-contracts de GitHub Packages.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Calidad y pruebas (Java 21)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          server-id: github
+      - name: Compilar, analizar y probar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./mvnw -B -ntp verify
+      - name: Reportes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            target/site/jacoco/
+            target/surefire-reports/
+
+  dependencies:
+    name: Vulnerabilidades de dependencias (OWASP)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+          server-id: github
+      - name: OWASP Dependency-Check (falla con CVSS >= 9)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: ./mvnw -B -ntp -Psecurity -DskipTests -Dquality.skip=true verify
+
+  ml:
+    name: Pruebas del entrenamiento (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pytest
+      - run: python -m pytest ml/tests
